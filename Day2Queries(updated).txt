@@ -1,0 +1,274 @@
+create table t1 (c1 int, c2 varchar(100));
+
+insert into t1 values(1,'a'),(2,'b'),(3,'c');
+
+create table t2 (c1 int, c3 varchar(100));
+
+insert into t2 value(3,'x'),(4,'y'),(5,'z');
+
+
+select * from t1;
+
+select * from t2;
+
+-- cross join
+
+
+select * from t1, t2;
+
+
+select t1.c1,t1.c2,t2.c3 from t1,t2;
+
+select t1.c1,c2,c3 from t1,t2;
+
+select c1,c2,c3 from t1,t2; --- query fails with ambiguos column error
+
+
+select t1.*,c3 from t1,t2;
+
+
+select * from t1 cross join t2;-- Ansi syntax for cross join
+
+
+
+
+select t1.c1,c2,c3 from t1 cross join t2;
+
+
+
+-- Inner Join 
+
+-- old syntax of Joins
+
+
+select * from t1 , t2 
+where t1.c1=t2.c1;
+
+-- New syntax (Ansi Standard)
+
+select * from t1 inner join t2 
+on t1.c1=t2.c1;
+
+select * from t1 inner join t2 
+where t1.c1=t2.c1;
+
+
+select * from t1  join t2 
+where t1.c1=t2.c1;
+
+
+-- Left Join possible only using Ansi Syntax
+
+select * from t1 left join t2
+on t1.c1=t2.c1;
+
+
+select * from t1 left join t2
+on t2.c1=t1.c1;
+
+
+
+select * from t1 left outer join t2
+on t2.c1=t1.c1;
+
+
+-- Right Join possible only using Ansi Syntax
+
+select * from t1 Right join t2
+on t1.c1=t2.c1;
+
+
+
+-- Full Join possible only using Ansi Syntax
+
+select * from t1 Full join t2
+on t1.c1=t2.c1; -- will not work in MySQL
+
+
+select * from T1 left join t2
+on t1.c1=t2.c1
+union
+select * from T1 right join t2
+on t1.c1=t2.c1;
+
+
+
+
+select * from T1 left join t2
+on t1.c1=t2.c1
+where t2.c3 is null
+union
+select * from T1 right join t2
+on t1.c1=t2.c1
+where t1.c2 is null;
+
+
+
+
+--Set Operators
+
+create table a(id int);
+create table b (id int);
+
+insert into a values(1),(2),(3);
+insert into b values(3),(4),(5);
+
+
+--union
+select * from a
+union 
+select * from b;
+
+
+select * from b
+union 
+select * from a;
+
+
+-- union all
+select * from a
+union  all
+select * from b;
+
+
+select * from b
+union all
+select * from a;
+
+-- Intersect-- Not supported in MySQL
+select * from a
+intersect
+select * from b;
+
+
+select * from b
+Intersect
+select * from a;
+
+-- working version of Intersect  query in mysql
+
+select * from a where id in (select id from b);
+
+-- Minus Not supported in MySQL
+select * from a
+Minus
+select * from b;
+-- working version of minus in mysql
+
+select * from a where id not in (select id from b);
+
+select * from b
+Minus
+select * from a;
+
+
+-- working version of minus in mysql
+
+select * from b where id not in (select id from a);
+
+
+
+
+
+-- errors 
+
+select * from t1
+union 
+select * from a;
+
+
+select c1 from t1
+union 
+select id from a;
+
+
+
+select c2 from t1
+union 
+select id from a;
+
+
+
+select id from a
+union 
+select c2 from t1;
+
+
+--error
+
+select dt from dt
+union 
+select id from a;
+
+
+
+
+
+
+
+-- add primray key
+
+create table parent(deptid int, deptname varchar(100));
+
+alter table parent add primary key(deptid);
+
+
+create table child(eid int, ename varchar(100), deptid varchar(100));
+
+alter table child modify deptid int;
+
+alter table child add constraint fk1 foreign key  (deptid) references parent(deptid);
+
+
+
+-- view
+
+create view vw_emp
+as
+select eid,ename,deptid from emp;
+
+update vw_emp set ename='xyz' where eid=1;
+
+
+
+create view vw_emp_2
+as
+select eid,ename,deptid from emp where deptid=2;
+
+create view vw_emp_dept as
+select ename,deptname,salary from
+emp join dept 
+on emp.deptid=dept.deptid
+
+
+
+update  vw_emp_dept
+set ename='xyz', deptname='HR'
+where ename='xyz';
+
+
+update  vw_emp_dept
+set ename='xyz'
+where ename='xyz';
+
+
+create view vw_emp_v3
+as
+select eid,ename name,deptid from emp;
+
+
+
+delete from vw_emp where eid=1;
+
+
+create table test1(id int , c1 varchar(100), c2 int not null);
+
+create view vw_test1 
+as
+select id,c1 from test1;
+
+
+insert into vw_test1 values(1,'abc');
+
+
+delete from vw_test1 where id=1;
